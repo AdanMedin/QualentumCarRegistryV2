@@ -1,7 +1,10 @@
 package com.aalonso.CarRegistry.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
 @Entity
 @Table(name = "vehicle")
 public class Vehicle {
@@ -27,6 +30,7 @@ public class Vehicle {
     private Integer numDoors;
 
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;

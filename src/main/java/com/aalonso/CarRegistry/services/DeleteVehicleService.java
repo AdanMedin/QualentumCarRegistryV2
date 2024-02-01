@@ -24,10 +24,10 @@ public class DeleteVehicleService {
 
     public Optional<VehicleDTO> deleteVehicleById(String id) {
         log.info("Accessed delete vehicle service...");
-        Optional<Vehicle> vehicleToDelete = vehicleRepository.findById(Integer.valueOf(id));
+        Optional<Vehicle> vehicleToDelete = vehicleRepository.findById(id);
         vehicleToDelete.ifPresentOrElse(
                 vehicle -> {
-                    vehicleRepository.deleteById(Integer.valueOf(id));
+                    vehicleRepository.deleteById(id);
                     log.info("This vehicle was deleted successfully: {}", vehicle);
                 },
                 () -> log.info("Vehicle with id: " + id + " does not exist")

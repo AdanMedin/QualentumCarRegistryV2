@@ -20,7 +20,7 @@ price double not null,
 year int not null,
 description varchar(300) not null,
 colour varchar(50) not null,
-fuelType varchar(20) not null,
-numDoors int not null,
+fuel_type varchar(20) not null,
+num_doors int not null,
 constraint fk_brand_id_brand foreign key (brand_id) references brand (id) on delete cascade on update cascade
 );

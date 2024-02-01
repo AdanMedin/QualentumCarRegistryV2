@@ -26,7 +26,7 @@ public class UpdateVehicleService {
 
     public Optional<VehicleDTO> updateVehicle(VehicleDTO vehicleDTO) {
         log.info("Accessed update vehicle service...");
-        Optional<Vehicle> vehicleToUpdate = vehicleRepository.findById(Integer.valueOf(vehicleDTO.getId()));
+        Optional<Vehicle> vehicleToUpdate = vehicleRepository.findById(vehicleDTO.getId());
         vehicleToUpdate.ifPresentOrElse(
                 vehicleFound -> {
                     // Con el método save() de JpaRepository.
@@ -37,7 +37,7 @@ public class UpdateVehicleService {
                 },
                 () -> log.info("Vehicle with id: " + vehicleDTO.getId() + " does not exist")
         );
-        return vehicleRepository.findById(Integer.valueOf(vehicleDTO.getId())).map(
+        return vehicleRepository.findById(vehicleDTO.getId()).map(
                 vehicle -> modelMapper.map(vehicle, VehicleDTO.class)
         );
     }

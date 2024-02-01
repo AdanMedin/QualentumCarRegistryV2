@@ -37,11 +37,12 @@ public class ShowVehicleService {
         // Aquí no utilizo un ifPresentOrElse porque findAll() siempre devuelve una lista vacía cuando no encuentra registros.
         utils.ifEmptyOrElse(
                 vehicles,
-                () -> log.error("There are no vehicles to show."),
+                () -> log.error("The database is empty"),
                 list -> {
                     log.info("Showing all vehicles...");
                     for (Vehicle vehicle : list) {
-                        log.info("Vehicle: {}", vehicle.toString());
+                        log.info("Vehicle found: {}", vehicle);
+                        log.info("Brand: {}", vehicle.getBrand());
                     }
                 }
         );
@@ -52,11 +53,14 @@ public class ShowVehicleService {
 
     public Optional<VehicleDTO> showVehicleById(String id) {
         log.info("Accessed show vehicle by id service...");
-        Optional<Vehicle> vehicleToDelete = vehicleRepository.findById(Integer.valueOf(id));
-        vehicleToDelete.ifPresentOrElse(
-                vehicleFound -> log.info("Vehicle found: {}", vehicleFound),
-                () -> log.info("Vehicle with id: " + id + " does not exist")
+        Optional<Vehicle> vehicleToShow = vehicleRepository.findById(id);
+        vehicleToShow.ifPresentOrElse(
+                vehicleFound -> {
+                    log.info("Vehicle found: {}", vehicleFound);
+                    log.info("With brand: {}", vehicleFound.getBrand());
+                },
+                () -> log.info("Vehicle with id: {} does not exist on database", id)
         );
-        return vehicleToDelete.map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class));
+        return vehicleToShow.map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class));
     }
 }

@@ -44,7 +44,7 @@ public class CarRegistryController {
         log.info("Accessed car registry controller...");
         Optional<List<VehicleDTO>> vehicles = showVehicleService.showAllVehicles();
         if (vehicles.isEmpty()) {
-            log.info("There are no vehicles to show");
+            log.info("Not vehicles found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(vehicles, HttpStatus.OK);
@@ -60,7 +60,7 @@ public class CarRegistryController {
         } else {
             Optional<VehicleDTO> vehicle = showVehicleService.showVehicleById(vehicleIdRequest.getId());
             if (vehicle.isEmpty()) {
-                log.info("Vehicle with id: " + vehicleIdRequest.getId() + " not found");
+                log.info("Vehicle not found");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(vehicle, HttpStatus.OK);
@@ -118,7 +118,7 @@ public class CarRegistryController {
         } else {
             Optional<VehicleDTO> deletedVehicle = deleteVehicleService.deleteVehicleById(vehicleIdRequest.getId());
             if (deletedVehicle.isEmpty()) {
-                log.info("Vehicle with id: " + vehicleIdRequest.getId() + " not found");
+                log.info("Vehicle not deleted");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(deletedVehicle, HttpStatus.OK);

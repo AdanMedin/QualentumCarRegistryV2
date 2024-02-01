@@ -1,9 +1,12 @@
 package com.aalonso.CarRegistry.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "brand")
 public class Brand {
@@ -18,6 +21,7 @@ public class Brand {
     @Column(nullable = false)
     private String country;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)
     private List<Vehicle> vehicles;
 }

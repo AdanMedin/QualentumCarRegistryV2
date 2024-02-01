@@ -1,12 +1,27 @@
 openapi: 3.1.0
 info:
-  title: Car Registry API
+  title: Vehicle Registry API
+  description: Api to manage the vehicle registry
+  contact:
+    email: aalonso@gmail.com
   version: 1.0.0
+tags:
+  - name: show_vehicles
+    description: Check the vehicles of the database
+  - name: add_vehicles
+    description: Add new vehicles to the database
+  - name: update_vehicles
+    description: Update vehicles from the database
+  - name: delete_vehicles
+    description: Delete vehicles from the database
 paths:
   /car_registry/show_all_vehicles:
     get:
+      tags:
+        - show_vehicles
       summary: Get the list of vehicles
       description: Returns the list of all vehicles
+      operationId: showAllVehicles
       responses:
         '200':
           description: List found
@@ -18,140 +33,86 @@ paths:
                   $ref: '#/components/schemas/Vehicle'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Bad request"
         '404':
           description: Not vehicles found
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "No vehicles found"
-        '500':
-          description: Internal error. An internal error has occurred on the server
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  timestamp: "2019-02-20T14:41:55.205+0000"
-                  status: 500
-                  error: "Internal Error"
-                  message: "Internal Error"
-                  path: "/car_registry/show_all_vehicles"
         default:
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Unexpected error"
+        '500':
+          description: Internal error
   /car_registry/show_vehicle_by_id:
     get:
+      tags:
+        - show_vehicles
       summary: Get vehicles
       description: Returns a vehicle by id
+      operationId: showVehicleById
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The id of the vehicle to retrieve
       responses:
         '200':
-          description: List found
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Vehicle'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Bad request"
-        '404':
-          description: Not vehicles found
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "No vehicles found"
-        '500':
-          description: Internal error. An internal error has occurred on the server
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  timestamp: "2019-02-20T14:41:55.205+0000"
-                  status: 500
-                  error: "Internal Error"
-                  message: "Internal Error"
-                  path: "/car_registry/show_vehicle_by_id"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Unexpected error"
-  /car_registry/add_vehicles:
-    post:
-      summary: Add vehicles
-      description: Add a vehicle list
-      responses:
-        '200':
-          description: Vehicle added successfully
+          description: Vehicle found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Vehicle'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Bad request"
         '404':
           description: Vehicle not found
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Vehicle not found"
-        '500':
-          description: Internal error. An internal error has occurred on the server
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  timestamp: "2019-02-20T14:41:55.205+0000"
-                  status: 500
-                  error: "Internal Error"
-                  message: "Internal Error"
-                  path: "/car_registry/add_vehicles"
         default:
           description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/add_vehicles:
+    post:
+      tags:
+        - add_vehicles
+      summary: Add vehicles
+      description: Add a vehicle list
+      operationId: addVehicles
+      requestBody:
+        description: List of vehicles to add
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Vehicle'
+        required: true
+      responses:
+        '200':
+          description: Vehicles added successfully
           content:
             application/json:
               schema:
-                type: object
-                default:
-                  message: "Unexpected error"
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Bad request
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
   /car_registry/update_vehicle:
-    post:
+    put:
+      tags:
+        - update_vehicles
       summary: Update a vehicle
       description: Updates a vehicle
+      operationId: updateVehicle
+      requestBody:
+        description: Vehicle data to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+        required: true
       responses:
         '200':
           description: Vehicle updated successfully
@@ -161,83 +122,37 @@ paths:
                 $ref: '#/components/schemas/Vehicle'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Bad request"
         '404':
           description: Vehicle not found
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Vehicle not found"
-        '500':
-          description: Internal error. An internal error has occurred on the server
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  timestamp: "2019-02-20T14:41:55.205+0000"
-                  status: 500
-                  error: "Internal Error"
-                  message: "Internal Error"
-                  path: "/car_registry/update_vehicle"
         default:
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Unexpected error"
+        '500':
+          description: Internal error
   /car_registry/delete_vehicle:
     delete:
+      tags:
+        - delete_vehicles
       summary: Delete a vehicle
       description: Deletes a vehicle by id
+      operationId: deleteVehicle
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The id of the vehicle to delete
       responses:
         '200':
           description: Vehicle deleted successfully
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Bad request"
         '404':
           description: Vehicle not found
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Vehicle not found"
-        '500':
-          description: Internal error. An internal error has occurred on the server
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  timestamp: "2019-02-20T14:41:55.205+0000"
-                  status: 500
-                  error: "Internal Error"
-                  message: "Internal Error"
-                  path: "/car_registry/delete_vehicle"
         default:
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                type: object
-                default:
-                  message: "Unexpected error"
+        '500':
+          description: Internal error
 components:
   schemas:
     Vehicle:
