@@ -1,0 +1,277 @@
+openapi: 3.1.0
+info:
+  title: Car Registry API
+  version: 1.0.0
+paths:
+  /car_registry/show_all_vehicles:
+    get:
+      summary: Get the list of vehicles
+      description: Returns the list of all vehicles
+      responses:
+        '200':
+          description: List found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Bad request"
+        '404':
+          description: Not vehicles found
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "No vehicles found"
+        '500':
+          description: Internal error. An internal error has occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  timestamp: "2019-02-20T14:41:55.205+0000"
+                  status: 500
+                  error: "Internal Error"
+                  message: "Internal Error"
+                  path: "/car_registry/show_all_vehicles"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Unexpected error"
+  /car_registry/show_vehicle_by_id:
+    get:
+      summary: Get vehicles
+      description: Returns a vehicle by id
+      responses:
+        '200':
+          description: List found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Bad request"
+        '404':
+          description: Not vehicles found
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "No vehicles found"
+        '500':
+          description: Internal error. An internal error has occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  timestamp: "2019-02-20T14:41:55.205+0000"
+                  status: 500
+                  error: "Internal Error"
+                  message: "Internal Error"
+                  path: "/car_registry/show_vehicle_by_id"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Unexpected error"
+  /car_registry/add_vehicles:
+    post:
+      summary: Add vehicles
+      description: Add a vehicle list
+      responses:
+        '200':
+          description: Vehicle added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Bad request"
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Vehicle not found"
+        '500':
+          description: Internal error. An internal error has occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  timestamp: "2019-02-20T14:41:55.205+0000"
+                  status: 500
+                  error: "Internal Error"
+                  message: "Internal Error"
+                  path: "/car_registry/add_vehicles"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Unexpected error"
+  /car_registry/update_vehicle:
+    post:
+      summary: Update a vehicle
+      description: Updates a vehicle
+      responses:
+        '200':
+          description: Vehicle updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Bad request"
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Vehicle not found"
+        '500':
+          description: Internal error. An internal error has occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  timestamp: "2019-02-20T14:41:55.205+0000"
+                  status: 500
+                  error: "Internal Error"
+                  message: "Internal Error"
+                  path: "/car_registry/update_vehicle"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Unexpected error"
+  /car_registry/delete_vehicle:
+    delete:
+      summary: Delete a vehicle
+      description: Deletes a vehicle by id
+      responses:
+        '200':
+          description: Vehicle deleted successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Bad request"
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Vehicle not found"
+        '500':
+          description: Internal error. An internal error has occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  timestamp: "2019-02-20T14:41:55.205+0000"
+                  status: 500
+                  error: "Internal Error"
+                  message: "Internal Error"
+                  path: "/car_registry/delete_vehicle"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                default:
+                  message: "Unexpected error"
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: string
+        brand:
+          $ref: '#/components/schemas/Brand'
+        model:
+          type: string
+        mileage:
+          type: integer
+        price:
+          type: number
+          format: double
+        year:
+          type: integer
+        colour:
+          type: string
+        fuelType:
+          type: string
+        numDoors:
+          type: integer
+        description:
+          type: string
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        warranty:
+          type: integer
+        country:
+          type: string
