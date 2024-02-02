@@ -3,8 +3,11 @@ info:
   title: Vehicle Registry API
   description: Api to manage the vehicle registry
   contact:
-    email: aalonso@gmail.com
+    email: adanalonsomedin@gmail.com
   version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1/car-registry-API
+    description: Url to access the API
 tags:
   - name: show_vehicles
     description: Check the vehicles of the database
@@ -13,6 +16,14 @@ tags:
   - name: update_vehicles
     description: Update vehicles from the database
   - name: delete_vehicles
+    description: Delete vehicles from the database
+  - name: show_brands
+    description: Check the vehicles of the database
+  - name: add_brands
+    description: Add new vehicles to the database
+  - name: update_brands
+    description: Update vehicles from the database
+  - name: delete_brands
     description: Delete vehicles from the database
 paths:
   /car_registry/show_all_vehicles:
@@ -152,6 +163,37 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
+  /car_registry/add_brands:
+    post:
+      tags:
+        - add_brands
+      summary: Add brands
+      description: Add a brand list
+      operationId: addBrands
+      requestBody:
+        description: List of brands to add
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Brand'
+        required: true
+      responses:
+        '200':
+          description: Brands added successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Brand'
+        '400':
+          description: Bad request
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
   /car_registry/update_vehicle:
     put:
       tags:
@@ -181,6 +223,35 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
+  /car_registry/update_brand:
+    put:
+      tags:
+        - update_brands
+      summary: Update a brand
+      description: Updates a brand
+      operationId: updateBrand
+      requestBody:
+        description: Brand data to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Brand'
+        required: true
+      responses:
+        '200':
+          description: Brand updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '400':
+          description: Bad request
+        '404':
+          description: Brand not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
   /car_registry/delete_vehicle:
     delete:
       tags:
@@ -188,13 +259,13 @@ paths:
       summary: Delete a vehicle
       description: Deletes a vehicle by id
       operationId: deleteVehicle
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
-          required: true
-          description: The id of the vehicle to delete
+      requestBody:
+        description: Vehicle data to delete
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleOrBrandIdRequest'
+        required: true
       responses:
         '200':
           description: Vehicle deleted successfully
@@ -202,6 +273,31 @@ paths:
           description: Bad request
         '404':
           description: Vehicle not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/delete_brand:
+    delete:
+      tags:
+        - delete_brands
+      summary: Delete a brand
+      description: Delete a brand by id
+      operationId: deleteBrand
+      requestBody:
+        description: Brand data to delete
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleOrBrandIdRequest'
+        required: true
+      responses:
+        '200':
+          description: Brand deleted successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Brand not found
         default:
           description: Unexpected error
         '500':
@@ -242,4 +338,9 @@ components:
         warranty:
           type: integer
         country:
+          type: string
+    VehicleOrBrandIdRequest:
+      type: object
+      properties:
+        id:
           type: string

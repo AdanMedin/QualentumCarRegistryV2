@@ -90,19 +90,26 @@ public class AddVehicleBrandService {
             log.info("New brand added to the database: {}", brandDTO);
             // Si brand llega con id, se comprueba si existe en la base de datos.
         } else if (brandRepository.findById(brandDTO.getId()).isEmpty()) {
-            // Si no existe ninguna marca con ese id se comprueba si existe una marca con el mismo nombre.
+            // Si no existe ninguna marca con ese id se comprueba si en la base de datos existe alguna marca con el nombre que trae el objeto brand.
             brandRepository.findByName(brandDTO.getName()).ifPresentOrElse(
                     // Este método se ejecuta si la marca existe en la base de datos.
                     // Sustituye al lambda "brand -> {brandChecked.set(brand);}"
                     brandChecked::set,
                     () -> {
                         log.info("Brand provided does not exist");
+                        if (brandDTO.getName().equals("string") || brandDTO.getName().isEmpty()) {
+                            brandChecked.set(null);
+                        }
                         brandDTO.setId(null);
                         brandChecked.set(brandRepository.save(modelMapper.map(brandDTO, Brand.class)));
                         log.info("New brand added to the database: {}", brandRepository.findByName(brandDTO.getName()));
                     }
             );
         }
-        return brandRepository.findById(brandChecked.get().getId());
+        if (brandChecked.get() == null) {
+            return Optional.empty();
+        } else {
+            return brandRepository.findById(brandChecked.get().getId());
+        }
     }
 }

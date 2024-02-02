@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -103,7 +104,7 @@ public class CarRegistryController {
         log.info("Accessed car registry controller...");
 
         if (vehicles == null || vehicles.isEmpty()) {
-            log.error("No vehicles to add the vehicle list is empty");
+            log.error("Not vehicles to add. Vehicle list is empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             Optional<List<VehicleDTO>> addedVehicles = addVehicleBrandService.addVehicles(vehicles);
@@ -120,12 +121,35 @@ public class CarRegistryController {
         }
     }
 
+    @PostMapping(value = "/add_brands", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<List<BrandDTO>>> addBrand(@RequestBody List<BrandDTO> brandDtoList) {
+        log.info("Accessed car registry controller...");
+
+        if (brandDtoList == null || brandDtoList.isEmpty()) {
+            log.error("Not brand to add. Brand list is empty");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            Optional<List<BrandDTO>> addedBrands = addVehicleBrandService.addBrands(brandDtoList);
+            if (addedBrands.isPresent() && addedBrands.get().size() == brandDtoList.size()) {
+                log.info("List of brands added successfully");
+                return new ResponseEntity<>(addedBrands, HttpStatus.OK);
+            } else if (addedBrands.isPresent() && !addedBrands.get().isEmpty() && addedBrands.get().size() < brandDtoList.size()) {
+                log.info("List of brands added partially, some brands were not added");
+                return new ResponseEntity<>(addedBrands, HttpStatus.PARTIAL_CONTENT);
+            } else {
+                log.info("List of brands was not added");
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+        }
+    }
+
     @PutMapping(value = "/update_vehicle", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Optional<VehicleDTO>> updateVehicle(@RequestBody VehicleDTO vehicle) {
         log.info("Accessed car registry controller...");
         if (vehicle.getId() == null || vehicle.getId().isEmpty()) {
-            log.error("No vehicle id was provided");
+            log.error("Not vehicle id was provided");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             Optional<VehicleDTO> updatedVehicle = updateVehicleBrandService.updateVehicle(vehicle);
@@ -133,8 +157,26 @@ public class CarRegistryController {
                 log.info("Vehicle not updated");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            log.info("Vehicle updated: {}", updatedVehicle);
+            log.info("Vehicle updated successfully");
             return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
+        }
+    }
+
+    @PutMapping(value = "/update_brand", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<BrandDTO>> updateBrand(@RequestBody BrandDTO brandDTO) {
+        log.info("Accessed car registry controller...");
+        if (brandDTO.getId() == null || brandDTO.getId().isEmpty()) {
+            log.error("Not brand id was provided");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            Optional<BrandDTO> updatedBrand = updateVehicleBrandService.updateBrand(brandDTO);
+            if (updatedBrand.isEmpty()) {
+                log.info("Brand not updated");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            log.info("Brand updated successfully");
+            return new ResponseEntity<>(updatedBrand, HttpStatus.OK);
         }
     }
 
@@ -143,7 +185,7 @@ public class CarRegistryController {
     public ResponseEntity<Optional<VehicleDTO>> deleteVehicleById(@RequestBody VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
         log.info("Accessed car registry controller...");
         if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
-            log.error("No vehicle id was provided");
+            log.error("Not vehicle id was provided");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             Optional<VehicleDTO> deletedVehicle = deleteVehicleBrandService.deleteVehicleById(vehicleOrBrandIdRequest.getId());
@@ -152,6 +194,23 @@ public class CarRegistryController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(deletedVehicle, HttpStatus.OK);
+        }
+    }
+
+    @DeleteMapping(value = "/delete_brand", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<BrandDTO>> deleteBrandById(@RequestBody VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
+        log.info("Accessed car registry controller...");
+        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+            log.error("Not brand id was provided");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            Optional<BrandDTO> deletedBrand = deleteVehicleBrandService.deleteBrandById(vehicleOrBrandIdRequest.getId());
+            if (deletedBrand.isEmpty()) {
+                log.info("Vehicle not deleted");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(deletedBrand, HttpStatus.OK);
         }
     }
 }

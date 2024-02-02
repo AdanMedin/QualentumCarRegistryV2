@@ -1,7 +1,10 @@
 package com.aalonso.CarRegistry.services;
 
+import com.aalonso.CarRegistry.dto.BrandDTO;
 import com.aalonso.CarRegistry.dto.VehicleDTO;
+import com.aalonso.CarRegistry.persistence.entity.Brand;
 import com.aalonso.CarRegistry.persistence.entity.Vehicle;
+import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,8 @@ public class UpdateVehicleBrandService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
-
+    @Autowired
+    BrandRepository brandRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     public Optional<VehicleDTO> updateVehicle(VehicleDTO vehicleDTO) {
@@ -31,14 +35,28 @@ public class UpdateVehicleBrandService {
                 vehicleFound -> {
                     // Con el método save() de JpaRepository.
                     // Si el vehiculo ya existe en la base de datos, este se actualiza.
-                    vehicleRepository.save(modelMapper.map(vehicleDTO, Vehicle.class));
-                    log.info("Vehicle to update: {}", vehicleToUpdate);
-                    log.info("Vehicle with id: {} was updated successfully.", vehicleDTO.getId());
+                    log.info("Vehicle to update: {}", vehicleFound.getModel());
+                    log.info("Updating vehicle: {}", vehicleRepository.save(modelMapper.map(vehicleDTO, Vehicle.class)));
                 },
-                () -> log.info("Vehicle with id: " + vehicleDTO.getId() + " does not exist")
+                () -> log.info("Vehicle with id: {} does not exist", vehicleDTO.getId())
         );
         return vehicleRepository.findById(vehicleDTO.getId()).map(
                 vehicle -> modelMapper.map(vehicle, VehicleDTO.class)
+        );
+    }
+
+    public Optional<BrandDTO> updateBrand(BrandDTO brandDTO) {
+        log.info("Accessed update brand service...");
+        Optional<Brand> brandToUpdate = brandRepository.findById(brandDTO.getId());
+        brandToUpdate.ifPresentOrElse(
+                brandFound -> {
+                    log.info("Brand to update: {}", brandFound.getName());
+                    log.info("Updating brand: {}", brandRepository.save(modelMapper.map(brandDTO, Brand.class)));
+                },
+                () -> log.info("Brand with id: {} does not exist", brandDTO.getId())
+        );
+        return brandRepository.findById(brandDTO.getId()).map(
+                brand -> modelMapper.map(brand, BrandDTO.class)
         );
     }
 }
