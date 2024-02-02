@@ -12,10 +12,10 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class DeleteVehicleService {
+public class DeleteVehicleBrandService {
     @PostConstruct
     public void init() {
-        log.info("DeleteVehicleService is operational...");
+        log.info("DeleteVehicleBrandService is operational...");
     }
     @Autowired
     private VehicleRepository vehicleRepository;

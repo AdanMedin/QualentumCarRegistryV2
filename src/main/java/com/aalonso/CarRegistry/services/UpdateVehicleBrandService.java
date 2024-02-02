@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UpdateVehicleService {
+public class UpdateVehicleBrandService {
     @PostConstruct
     public void init() {
-        log.info("UpdateVehicleService is operational...");
+        log.info("UpdateVehicleBrandService is operational...");
     }
 
     @Autowired

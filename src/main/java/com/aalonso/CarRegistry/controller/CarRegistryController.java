@@ -1,11 +1,12 @@
 package com.aalonso.CarRegistry.controller;
 
+import com.aalonso.CarRegistry.dto.BrandDTO;
 import com.aalonso.CarRegistry.dto.VehicleDTO;
-import com.aalonso.CarRegistry.dto.VehicleIdRequest;
-import com.aalonso.CarRegistry.services.AddVehicleService;
-import com.aalonso.CarRegistry.services.DeleteVehicleService;
-import com.aalonso.CarRegistry.services.ShowVehicleService;
-import com.aalonso.CarRegistry.services.UpdateVehicleService;
+import com.aalonso.CarRegistry.dto.VehicleOrBrandIdRequest;
+import com.aalonso.CarRegistry.services.AddVehicleBrandService;
+import com.aalonso.CarRegistry.services.DeleteVehicleBrandService;
+import com.aalonso.CarRegistry.services.ShowVehicleBrandService;
+import com.aalonso.CarRegistry.services.UpdateVehicleBrandService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +30,20 @@ public class CarRegistryController {
     }
 
     @Autowired
-    ShowVehicleService showVehicleService;
+    ShowVehicleBrandService showVehicleBrandService;
     @Autowired
-    AddVehicleService addVehicleService;
+    AddVehicleBrandService addVehicleBrandService;
     @Autowired
-    DeleteVehicleService deleteVehicleService;
+    DeleteVehicleBrandService deleteVehicleBrandService;
     @Autowired
-    UpdateVehicleService updateVehicleService;
+    UpdateVehicleBrandService updateVehicleBrandService;
 
 
     @GetMapping(value = "/show_all_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Optional<List<VehicleDTO>>> showAllVehicles() {
         log.info("Accessed car registry controller...");
-        Optional<List<VehicleDTO>> vehicles = showVehicleService.showAllVehicles();
+        Optional<List<VehicleDTO>> vehicles = showVehicleBrandService.showAllVehicles();
         if (vehicles.isEmpty()) {
             log.info("Not vehicles found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -52,15 +53,44 @@ public class CarRegistryController {
 
     @GetMapping(value = "/show_vehicle_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<VehicleDTO>> showAllVehicleById(VehicleIdRequest vehicleIdRequest) {
+    public ResponseEntity<Optional<VehicleDTO>> showVehicleById(VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
         log.info("Accessed car registry controller...");
-        if (vehicleIdRequest.getId() == null || vehicleIdRequest.getId().isEmpty()) {
+        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
             log.error("No vehicle id was provided");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            Optional<VehicleDTO> vehicle = showVehicleService.showVehicleById(vehicleIdRequest.getId());
+            Optional<VehicleDTO> vehicle = showVehicleBrandService.showVehicleById(vehicleOrBrandIdRequest.getId());
             if (vehicle.isEmpty()) {
                 log.info("Vehicle not found");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(vehicle, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(value = "/show_all_brands", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<List<BrandDTO>>> showAllBrands() {
+        log.info("Accessed car registry controller...");
+        Optional<List<BrandDTO>> brandList = showVehicleBrandService.showAllBrands();
+        if (brandList.isEmpty()) {
+            log.info("Not brands found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(brandList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/show_brand_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<BrandDTO>> showBrandById(VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
+        log.info("Accessed car registry controller...");
+        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+            log.error("Not brand id was provided");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            Optional<BrandDTO> vehicle = showVehicleBrandService.showBrandById(vehicleOrBrandIdRequest.getId());
+            if (vehicle.isEmpty()) {
+                log.info("Brand not found");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(vehicle, HttpStatus.OK);
@@ -76,7 +106,7 @@ public class CarRegistryController {
             log.error("No vehicles to add the vehicle list is empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            Optional<List<VehicleDTO>> addedVehicles = addVehicleService.addVehicles(vehicles);
+            Optional<List<VehicleDTO>> addedVehicles = addVehicleBrandService.addVehicles(vehicles);
             if (addedVehicles.isPresent() && addedVehicles.get().size() == vehicles.size()) {
                 log.info("List of vehicles added successfully");
                 return new ResponseEntity<>(addedVehicles, HttpStatus.OK);
@@ -98,7 +128,7 @@ public class CarRegistryController {
             log.error("No vehicle id was provided");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            Optional<VehicleDTO> updatedVehicle = updateVehicleService.updateVehicle(vehicle);
+            Optional<VehicleDTO> updatedVehicle = updateVehicleBrandService.updateVehicle(vehicle);
             if (updatedVehicle.isEmpty()) {
                 log.info("Vehicle not updated");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -110,13 +140,13 @@ public class CarRegistryController {
 
     @DeleteMapping(value = "/delete_vehicle", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<VehicleDTO>> deleteVehicleById(@RequestBody VehicleIdRequest vehicleIdRequest) {
+    public ResponseEntity<Optional<VehicleDTO>> deleteVehicleById(@RequestBody VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
         log.info("Accessed car registry controller...");
-        if (vehicleIdRequest.getId() == null || vehicleIdRequest.getId().isEmpty()) {
+        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
             log.error("No vehicle id was provided");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            Optional<VehicleDTO> deletedVehicle = deleteVehicleService.deleteVehicleById(vehicleIdRequest.getId());
+            Optional<VehicleDTO> deletedVehicle = deleteVehicleBrandService.deleteVehicleById(vehicleOrBrandIdRequest.getId());
             if (deletedVehicle.isEmpty()) {
                 log.info("Vehicle not deleted");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

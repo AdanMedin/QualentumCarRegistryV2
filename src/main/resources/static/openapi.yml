@@ -68,6 +68,59 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
+  /car_registry/show_all_brands:
+    get:
+      tags:
+        - show_brands
+      summary: Get the list of brands
+      description: Returns the list of all brands
+      operationId: showAllBrands
+      responses:
+        '200':
+          description: List found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Brand'
+        '400':
+          description: Bad request
+        '404':
+          description: Not brands found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/show_brand_by_id:
+    get:
+      tags:
+        - show_brands
+      summary: Get brand
+      description: Returns a brand by id
+      operationId: showBrandById
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The id of the brand to retrieve
+      responses:
+        '200':
+          description: Brand found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '400':
+          description: Bad request
+        '404':
+          description: Brand not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
   /car_registry/add_vehicles:
     post:
       tags:

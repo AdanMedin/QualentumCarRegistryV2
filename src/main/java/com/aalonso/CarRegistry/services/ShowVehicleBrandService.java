@@ -1,7 +1,10 @@
 package com.aalonso.CarRegistry.services;
 
+import com.aalonso.CarRegistry.dto.BrandDTO;
 import com.aalonso.CarRegistry.dto.VehicleDTO;
+import com.aalonso.CarRegistry.persistence.entity.Brand;
 import com.aalonso.CarRegistry.persistence.entity.Vehicle;
+import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
 import com.aalonso.CarRegistry.utils.Utils;
 import jakarta.annotation.PostConstruct;
@@ -15,14 +18,16 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ShowVehicleService {
+public class ShowVehicleBrandService {
     @PostConstruct
     public void init() {
-        log.info("ShowVehicleService is operational...");
+        log.info("ShowVehicleBrandService is operational...");
     }
 
     @Autowired
     private VehicleRepository vehicleRepository;
+    @Autowired
+    private BrandRepository brandRepository;
     @Autowired
     private Utils utils;
 
@@ -62,5 +67,38 @@ public class ShowVehicleService {
                 () -> log.info("Vehicle with id: {} does not exist on database", id)
         );
         return vehicleToShow.map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class));
+    }
+
+    public Optional<List<BrandDTO>> showAllBrands() {
+        log.info("Accessed show all brand service...");
+
+        List<Brand> brandsToShow;
+        brandsToShow = brandRepository.findAll();
+
+        // Aquí no utilizo un ifPresentOrElse porque findAll() siempre devuelve una lista vacía cuando no encuentra registros.
+        utils.ifEmptyOrElse(
+                brandsToShow,
+                () -> log.error("The database is empty"),
+                list -> {
+                    log.info("Showing all brands...");
+                    for (Brand brand : list) {
+                        log.info("Brand found: {}", brand);
+                    }
+                }
+        );
+        return brandsToShow.isEmpty() ? Optional.empty() : Optional.of(brandsToShow.stream()
+                .map(brand -> modelMapper.map(brand, BrandDTO.class))
+                .collect(Collectors.toList()));
+    }
+
+    public Optional<BrandDTO> showBrandById(String id) {
+        log.info("Accessed show brand by id service...");
+        Optional<Brand> brandToShow = brandRepository.findById(id);
+        brandToShow.ifPresentOrElse(
+                brandFound ->
+                    log.info("Brand found: {}", brandFound),
+                () -> log.info("Brand with id: {} does not exist on database", id)
+        );
+        return brandToShow.map(brand -> modelMapper.map(brand, BrandDTO.class));
     }
 }
