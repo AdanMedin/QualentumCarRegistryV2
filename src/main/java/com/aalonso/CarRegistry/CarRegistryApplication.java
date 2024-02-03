@@ -5,6 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * El el directorio raiz del proyecto, hay un docker-compose.yml.
+ * Ejecutandolo se levanta el contenedor de la base de datos y se ejecuta el script (init_vehicles_db.sql) que la crea.
+ * La ruta para acceder a swagger es: http://localhost:8080/v1/car-registry-API/swagger-ui/index.html
+ * Documentación con open API en el archivo /src/main/resources/static/openapi.yaml
+ * */
 @Slf4j
 @SpringBootApplication
 public class CarRegistryApplication {

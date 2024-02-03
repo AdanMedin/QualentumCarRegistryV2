@@ -37,21 +37,20 @@ public class AddVehicleBrandService {
         log.info("Accessed add vehicle service...");
         List<VehicleDTO> vehiclesDtoAdded = new ArrayList<>();
         vehicleDtoList.forEach(vehicleDTO -> {
-            //Comprobamos que la marca exista en la base de datos y la añadimos si no existe.
-            //En caso de que se añada una nueva marca, se devuelve el objeto marca añadido y se añade al vehiculo.
-            brandChecker(vehicleDTO.getBrand()).ifPresent(brand ->
-                    vehicleDTO.setBrand(modelMapper.map(brand, BrandDTO.class))
-            );
-
-            //Guardamos el vehiculo en la base de datos.
-            Vehicle savedVehicle = vehicleRepository.save(modelMapper.map(vehicleDTO, Vehicle.class));
-            if (savedVehicle.getId() != null) {
-                log.info("Vehicle was added correctly: {}", vehicleDTO);
-                vehiclesDtoAdded.add(modelMapper.map(savedVehicle, VehicleDTO.class));
-            } else {
-                log.error("Failed to save vehicle: {}", vehicleDTO);
+            if (vehicleDTO.getBrand() != null) {
+                //Comprobamos que la marca exista en la base de datos y la añadimos si no existe.
+                brandChecker(vehicleDTO.getBrand()).ifPresentOrElse(brandDTO -> {
+                    vehicleDTO.setBrand(brandDTO);
+                    //Guardamos el vehiculo en la base de datos.
+                    Vehicle savedVehicle = vehicleRepository.save(modelMapper.map(vehicleDTO, Vehicle.class));
+                    if (savedVehicle.getId() != null) {
+                        log.info("Vehicle was added correctly: {}", vehicleDTO);
+                        vehiclesDtoAdded.add(modelMapper.map(savedVehicle, VehicleDTO.class));
+                    } else {
+                        log.error("Failed to save vehicle");
+                    }
+                }, () -> log.error("Brand does not exist in the database and cant be added"));
             }
-
         });
         return vehiclesDtoAdded.isEmpty() ? Optional.empty() : Optional.of(vehiclesDtoAdded);
     }
@@ -64,52 +63,54 @@ public class AddVehicleBrandService {
             //Comprobamos que la marca exista en la base de datos y la añadimos si no existe.
             //En caso de que se añada una nueva marca, se devuelve el objeto marca añadido y se añade al vehiculo.
             Optional<Brand> brandToAdd = brandRepository.findByName(brandDTO.getName());
-            brandToAdd.ifPresentOrElse(
-                    brand -> log.info("This brand already exist: {}", brand.getName()),
-                    () -> {
-                        // Guardamos la marca en la base de datos.
-                        Brand savedBrand = brandRepository.save(modelMapper.map(brandDTO, Brand.class));
-                        if (savedBrand.getId() != null) {
-                            log.info("Brand was added correctly: {}", brandDTO);
-                            brandsDtoAdded.add(modelMapper.map(savedBrand, BrandDTO.class));
-                        } else {
-                            log.error("Failed to save brand: {}", brandDTO.getName());
-                        }
-                    });
+            brandToAdd.ifPresentOrElse(brand -> log.info("This brand already exist: {}", brand.getName()), () -> {
+                // Guardamos la marca en la base de datos.
+                Brand savedBrand = brandRepository.save(modelMapper.map(brandDTO, Brand.class));
+                if (savedBrand.getId() != null) {
+                    log.info("Brand was added correctly: {}", brandDTO);
+                    brandsDtoAdded.add(modelMapper.map(savedBrand, BrandDTO.class));
+                } else {
+                    log.error("Failed to save brand: {}", brandDTO.getName());
+                }
+            });
         });
         return brandsDtoAdded.isEmpty() ? Optional.empty() : Optional.of(brandsDtoAdded);
     }
 
     // Cuando añadimos un nuevo vehículo comprueba si la marca existe en la base de datos, si no existe se añade.
-    private Optional<Brand> brandChecker(BrandDTO brandDTO) {
+    private Optional<BrandDTO> brandChecker(BrandDTO brandDTO) {
         AtomicReference<Brand> brandChecked = new AtomicReference<>(modelMapper.map(brandDTO, Brand.class));
         // Si brand llega sin id, se añade a la base de datos.
         if (brandDTO.getId() == null || brandDTO.getId().isEmpty() || brandDTO.getId().equals("string")) {
-            log.info("Brand provided does not exist");
-            brandChecked.set(brandRepository.save(modelMapper.map(brandDTO, Brand.class)));
-            log.info("New brand added to the database: {}", brandDTO);
+            if (brandDTO.getName() == null || brandDTO.getName().equals("string") || brandDTO.getName().isEmpty()) {
+                log.info("Not brand provided");
+                brandChecked.set(null);
+            } else {
+                brandRepository.findByName(brandDTO.getName()).ifPresentOrElse(
+                        // Sustituye al lambda "brand -> {brandChecked.set(brand);}"
+                        brandChecked::set, () -> {
+                            log.info("Brand provided does not exist in the database. New brand will be added.");
+                            brandDTO.setId(null);
+                            brandChecked.set(brandRepository.save(modelMapper.map(brandDTO, Brand.class)));
+                            log.info("New brand added to the database: {}", brandRepository.findByName(brandDTO.getName()));
+                        });
+            }
             // Si brand llega con id, se comprueba si existe en la base de datos.
         } else if (brandRepository.findById(brandDTO.getId()).isEmpty()) {
             // Si no existe ninguna marca con ese id se comprueba si en la base de datos existe alguna marca con el nombre que trae el objeto brand.
             brandRepository.findByName(brandDTO.getName()).ifPresentOrElse(
                     // Este método se ejecuta si la marca existe en la base de datos.
                     // Sustituye al lambda "brand -> {brandChecked.set(brand);}"
-                    brandChecked::set,
-                    () -> {
-                        log.info("Brand provided does not exist");
-                        if (brandDTO.getName().equals("string") || brandDTO.getName().isEmpty()) {
-                            brandChecked.set(null);
-                        }
-                        brandDTO.setId(null);
-                        brandChecked.set(brandRepository.save(modelMapper.map(brandDTO, Brand.class)));
-                        log.info("New brand added to the database: {}", brandRepository.findByName(brandDTO.getName()));
-                    }
-            );
+                    brandChecked::set, () -> {
+                        log.info("Brand provided does not exist and no brand name matches the one provided.");
+                        brandChecked.set(null);
+                    });
         }
+        // Devuelve un Optional con el objeto Brand si este existe, si no existe devuelve un Optional vacío.
         if (brandChecked.get() == null) {
             return Optional.empty();
         } else {
-            return brandRepository.findById(brandChecked.get().getId());
+            return Optional.of(modelMapper.map(brandChecked.get(), BrandDTO.class));
         }
     }
 }
