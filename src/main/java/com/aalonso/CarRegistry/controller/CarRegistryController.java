@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Controller
@@ -42,14 +43,18 @@ public class CarRegistryController {
 
     @GetMapping(value = "/show_all_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<List<VehicleDTO>>> showAllVehicles() {
+    public CompletableFuture<ResponseEntity<Optional<List<VehicleDTO>>>> showAllVehicles() {
         log.info("Accessed car registry controller...");
-        Optional<List<VehicleDTO>> vehicles = showVehicleBrandService.showAllVehicles();
-        if (vehicles.isEmpty()) {
-            log.info("Not vehicles found");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(vehicles, HttpStatus.OK);
+        CompletableFuture<Optional<List<VehicleDTO>>> VehicleList = showVehicleBrandService.showAllVehicles();
+
+        /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
+        return VehicleList.thenApply(vehicles -> {
+            if (vehicles.isEmpty()) {
+                log.info("Not vehicles found");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(vehicles, HttpStatus.OK);
+        });
     }
 
     @GetMapping(value = "/show_vehicle_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,14 +76,18 @@ public class CarRegistryController {
 
     @GetMapping(value = "/show_all_brands", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<List<BrandDTO>>> showAllBrands() {
+    public CompletableFuture<ResponseEntity<Optional<List<BrandDTO>>>> showAllBrands() {
         log.info("Accessed car registry controller...");
-        Optional<List<BrandDTO>> brandList = showVehicleBrandService.showAllBrands();
-        if (brandList.isEmpty()) {
-            log.info("Not brands found");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(brandList, HttpStatus.OK);
+        CompletableFuture<Optional<List<BrandDTO>>> brandList = showVehicleBrandService.showAllBrands();
+
+        /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
+        return brandList.thenApply(brands -> {
+            if (brands.isEmpty()) {
+                log.info("Not brands found");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(brands, HttpStatus.OK);
+        });
     }
 
     @GetMapping(value = "/show_brand_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -100,47 +109,55 @@ public class CarRegistryController {
 
     @PostMapping(value = "/add_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<List<VehicleDTO>>> addVehicle(@RequestBody List<VehicleDTO> vehicles) {
+    public CompletableFuture<ResponseEntity<Optional<List<VehicleDTO>>>> addVehicle(@RequestBody List<VehicleDTO> vehicleDTOList) {
         log.info("Accessed car registry controller...");
 
-        if (vehicles == null || vehicles.isEmpty()) {
+        if (vehicleDTOList == null || vehicleDTOList.isEmpty()) {
             log.error("Not vehicles to add. Vehicle list is empty");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
         } else {
-            Optional<List<VehicleDTO>> addedVehicles = addVehicleBrandService.addVehicles(vehicles);
-            if (addedVehicles.isPresent() && addedVehicles.get().size() == vehicles.size()) {
-                log.info("List of vehicles added successfully");
-                return new ResponseEntity<>(addedVehicles, HttpStatus.OK);
-            } else if (addedVehicles.isPresent() && !addedVehicles.get().isEmpty() && addedVehicles.get().size() < vehicles.size()) {
-                log.info("List of vehicles added partially, some vehicles were not added");
-                return new ResponseEntity<>(addedVehicles, HttpStatus.PARTIAL_CONTENT);
-            } else {
-                log.info("List of vehicles was not added");
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
+            CompletableFuture<Optional<List<VehicleDTO>>> addedVehicles = addVehicleBrandService.addVehicles(vehicleDTOList);
+
+            /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
+            return addedVehicles.thenApply(vehicles -> {
+                if (vehicles.isPresent() && vehicles.get().size() == vehicleDTOList.size()) {
+                    log.info("List of vehicles added successfully");
+                    return new ResponseEntity<>(vehicles, HttpStatus.OK);
+                } else if (vehicles.isPresent() && !vehicles.get().isEmpty() && vehicles.get().size() < vehicleDTOList.size()) {
+                    log.info("List of vehicles added partially, some vehicles were not added");
+                    return new ResponseEntity<>(vehicles, HttpStatus.PARTIAL_CONTENT);
+                } else {
+                    log.info("List of vehicles was not added");
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            });
         }
     }
 
     @PostMapping(value = "/add_brands", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<List<BrandDTO>>> addBrand(@RequestBody List<BrandDTO> brandDtoList) {
+    public CompletableFuture<ResponseEntity<Optional<List<BrandDTO>>>> addBrand(@RequestBody List<BrandDTO> brandDTOList) {
         log.info("Accessed car registry controller...");
 
-        if (brandDtoList == null || brandDtoList.isEmpty()) {
+        if (brandDTOList == null || brandDTOList.isEmpty()) {
             log.error("Not brand to add. Brand list is empty");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
         } else {
-            Optional<List<BrandDTO>> addedBrands = addVehicleBrandService.addBrands(brandDtoList);
-            if (addedBrands.isPresent() && addedBrands.get().size() == brandDtoList.size()) {
-                log.info("List of brands added successfully");
-                return new ResponseEntity<>(addedBrands, HttpStatus.OK);
-            } else if (addedBrands.isPresent() && !addedBrands.get().isEmpty() && addedBrands.get().size() < brandDtoList.size()) {
-                log.info("List of brands added partially, some brands were not added");
-                return new ResponseEntity<>(addedBrands, HttpStatus.PARTIAL_CONTENT);
-            } else {
-                log.info("List of brands was not added");
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
+            CompletableFuture<Optional<List<BrandDTO>>> addedBrands = addVehicleBrandService.addBrands(brandDTOList);
+
+            /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
+            return addedBrands.thenApply(brands -> {
+                if (brands.isPresent() && brands.get().size() == brandDTOList.size()) {
+                    log.info("List of brands added successfully");
+                    return new ResponseEntity<>(brands, HttpStatus.OK);
+                } else if (brands.isPresent() && !brands.get().isEmpty() && brands.get().size() < brandDTOList.size()) {
+                    log.info("List of brands added partially, some brands were not added");
+                    return new ResponseEntity<>(brands, HttpStatus.PARTIAL_CONTENT);
+                } else {
+                    log.info("List of brands was not added");
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            });
         }
     }
 

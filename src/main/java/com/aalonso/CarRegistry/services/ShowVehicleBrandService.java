@@ -11,9 +11,12 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +36,9 @@ public class ShowVehicleBrandService {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public Optional<List<VehicleDTO>> showAllVehicles() {
+    @Async
+    public CompletableFuture<Optional<List<VehicleDTO>>> showAllVehicles() {
+        long startTime = System.currentTimeMillis();
         log.info("Accessed show all vehicles service...");
 
         List<Vehicle> vehicles;
@@ -51,9 +56,18 @@ public class ShowVehicleBrandService {
                     }
                 }
         );
-        return vehicles.isEmpty() ? Optional.empty() : Optional.of(vehicles.stream()
-                .map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class))
-                .collect(Collectors.toList()));
+
+        long endTime = System.currentTimeMillis();
+        log.info("Execution time: {} ms", (endTime - startTime));
+
+        /* CompletableFuture devuelve una variable de tipo Future que se completa con el fin de la ejecución.
+            Si la lista de vehículos está vacía se devuelve un Optional.empty().
+            Si la lista de vehículos no está vacía, se devuelve un Optional que contiene la lista transformada de objetos VehicleDTO. */
+        return CompletableFuture.completedFuture(
+                vehicles.isEmpty() ? Optional.empty() : Optional.of(vehicles.stream()
+                        .map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class))
+                        .collect(Collectors.toList()))
+        );
     }
 
     public Optional<VehicleDTO> showVehicleById(String id) {
@@ -69,8 +83,10 @@ public class ShowVehicleBrandService {
         return vehicleToShow.map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class));
     }
 
-    public Optional<List<BrandDTO>> showAllBrands() {
+    @Async
+    public CompletableFuture<Optional<List<BrandDTO>>> showAllBrands() {
         log.info("Accessed show all brand service...");
+        long startTime = System.currentTimeMillis();
 
         List<Brand> brandsToShow;
         brandsToShow = brandRepository.findAll();
@@ -86,9 +102,18 @@ public class ShowVehicleBrandService {
                     }
                 }
         );
-        return brandsToShow.isEmpty() ? Optional.empty() : Optional.of(brandsToShow.stream()
-                .map(brand -> modelMapper.map(brand, BrandDTO.class))
-                .collect(Collectors.toList()));
+
+        long endTime = System.currentTimeMillis();
+        log.info("Execution time: {} ms", (endTime - startTime));
+
+        /* CompletableFuture devuelve una variable de tipo Future que se completa con el fin de la ejecución.
+            Si la lista de vehículos está vacía se devuelve un Optional.empty().
+            Si la lista de vehículos no está vacía, se devuelve un Optional que contiene la lista transformada de objetos BrandDTO. */
+        return CompletableFuture.completedFuture(
+                brandsToShow.isEmpty() ? Optional.empty() : Optional.of(brandsToShow.stream()
+                        .map(brand -> modelMapper.map(brand, BrandDTO.class))
+                        .collect(Collectors.toList()))
+        );
     }
 
     public Optional<BrandDTO> showBrandById(String id) {
@@ -96,7 +121,7 @@ public class ShowVehicleBrandService {
         Optional<Brand> brandToShow = brandRepository.findById(id);
         brandToShow.ifPresentOrElse(
                 brandFound ->
-                    log.info("Brand found: {}", brandFound),
+                        log.info("Brand found: {}", brandFound),
                 () -> log.info("Brand with id: {} does not exist on database", id)
         );
         return brandToShow.map(brand -> modelMapper.map(brand, BrandDTO.class));
