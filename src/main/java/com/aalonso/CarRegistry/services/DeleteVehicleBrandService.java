@@ -28,29 +28,40 @@ public class DeleteVehicleBrandService {
 
     // Elimina vehiculos de la base de datos
     public Optional<VehicleDTO> deleteVehicleById(String id) {
+
         log.info("Accessed delete vehicle service...");
         Optional<Vehicle> vehicleToDelete = vehicleRepository.findById(id);
+        // Si el Optional contiene un valor, ejecutamos el primer lambda, si no, ejecutamos el segundo lambda.
         vehicleToDelete.ifPresentOrElse(
                 vehicle -> {
+
                     vehicleRepository.deleteById(id);
                     log.info("This vehicle was deleted successfully: {}", vehicle);
+
                 },
                 () -> log.info("Vehicle with id: " + id + " does not exist")
         );
+
         return vehicleToDelete.map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class)); //Si el Optional contiene un valor "vehicleToDelete.map()", lo mapeamos a un DTO "modelMapper.map()"
     }
 
     // Elimina marcas de la base de datos
     public Optional<BrandDTO> deleteBrandById(String id) {
+
         log.info("Accessed delete brand service...");
         Optional<Brand> brandToDelete = brandRepository.findById(id);
+
+        // Si el Optional contiene un valor, ejecutamos el primer lambda, si no, ejecutamos el segundo lambda.
         brandToDelete.ifPresentOrElse(
                 brand -> {
                     brandRepository.deleteById(id);
                     log.info("Brand {} was deleted successfully", brand.getName());
+
                 },
                 () -> log.info("Brand with id: " + id + " does not exist")
         );
+
+        // Si el Optional contiene un valor "brandToDelete.map()", lo mapeamos a un DTO "modelMapper.map()"
         return brandToDelete.map(brand -> modelMapper.map(brand, BrandDTO.class));
     }
 }
