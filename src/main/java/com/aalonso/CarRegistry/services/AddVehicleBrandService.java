@@ -7,6 +7,7 @@ import com.aalonso.CarRegistry.persistence.entity.Vehicle;
 import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class AddVehicleBrandService {
 
 
     //Agregar vehiculos a la base de datos
+    @Transactional
     @Async
     public CompletableFuture<Optional<List<VehicleDTO>>> addVehicles(List<VehicleDTO> vehicleDtoList) {
 
@@ -79,6 +81,7 @@ public class AddVehicleBrandService {
     }
 
     //Agregar marcas a la base de datos
+    @Transactional
     @Async
     public CompletableFuture<Optional<List<BrandDTO>>> addBrands(List<BrandDTO> brandDtoList) {
 

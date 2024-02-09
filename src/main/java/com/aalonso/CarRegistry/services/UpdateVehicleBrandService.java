@@ -7,6 +7,7 @@ import com.aalonso.CarRegistry.persistence.entity.Vehicle;
 import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class UpdateVehicleBrandService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Actualiza vehiculos en la base de datos
+    @Transactional
     public Optional<VehicleDTO> updateVehicle(VehicleDTO vehicleDTO) {
 
         log.info("Accessed update vehicle service...");
@@ -54,6 +56,7 @@ public class UpdateVehicleBrandService {
 
 
     // Actualiza marcas en la base de datos
+    @Transactional
     public Optional<BrandDTO> updateBrand(BrandDTO brandDTO) {
 
         log.info("Accessed update brand service...");

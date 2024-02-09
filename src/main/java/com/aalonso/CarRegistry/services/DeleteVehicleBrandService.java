@@ -7,6 +7,7 @@ import com.aalonso.CarRegistry.persistence.entity.Vehicle;
 import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class DeleteVehicleBrandService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Elimina vehiculos de la base de datos
+    @Transactional
     public Optional<VehicleDTO> deleteVehicleById(String id) {
 
         log.info("Accessed delete vehicle service...");
@@ -46,6 +48,7 @@ public class DeleteVehicleBrandService {
     }
 
     // Elimina marcas de la base de datos
+    @Transactional
     public Optional<BrandDTO> deleteBrandById(String id) {
 
         log.info("Accessed delete brand service...");
