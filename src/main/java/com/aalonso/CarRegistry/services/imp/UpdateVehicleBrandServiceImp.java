@@ -1,4 +1,4 @@
-package com.aalonso.CarRegistry.services;
+package com.aalonso.CarRegistry.services.imp;
 
 import com.aalonso.CarRegistry.dto.BrandDTO;
 import com.aalonso.CarRegistry.dto.VehicleDTO;
@@ -6,6 +6,7 @@ import com.aalonso.CarRegistry.persistence.entity.Brand;
 import com.aalonso.CarRegistry.persistence.entity.Vehicle;
 import com.aalonso.CarRegistry.persistence.repository.BrandRepository;
 import com.aalonso.CarRegistry.persistence.repository.VehicleRepository;
+import com.aalonso.CarRegistry.services.interfaces.UpdateVehicleBrandService;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,10 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UpdateVehicleBrandService {
+public class UpdateVehicleBrandServiceImp implements UpdateVehicleBrandService {
     @PostConstruct
     public void init() {
-        log.info("UpdateVehicleBrandService is operational...");
+        log.info("UpdateVehicleBrandServiceImp is operational...");
     }
 
     @Autowired
@@ -30,6 +31,7 @@ public class UpdateVehicleBrandService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Actualiza vehiculos en la base de datos
+    @Override
     @Transactional
     public Optional<VehicleDTO> updateVehicle(VehicleDTO vehicleDTO) {
 
@@ -56,6 +58,7 @@ public class UpdateVehicleBrandService {
 
 
     // Actualiza marcas en la base de datos
+    @Override
     @Transactional
     public Optional<BrandDTO> updateBrand(BrandDTO brandDTO) {
 

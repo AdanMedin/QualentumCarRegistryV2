@@ -24,3 +24,11 @@ fuel_type varchar(20) not null,
 num_doors int not null,
 constraint fk_brand_id_brand foreign key (brand_id) references brand (id) on delete cascade on update cascade
 );
+
+create table user (
+id int primary key not null AUTO_INCREMENT,
+name varchar(100) not null,
+email varchar(255) not null,
+password varchar(255) not null,
+role varchar(20) not null, default 'ROLE_CLIENT'
+);

@@ -25,6 +25,10 @@ tags:
     description: Update vehicles from the database
   - name: delete_brands
     description: Delete vehicles from the database
+  - name: sing_up
+    description: Add new users to the database
+  - name: log_in
+    description: Login to the application
 paths:
   /car_registry/show_all_vehicles:
     get:
@@ -302,6 +306,63 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
+  /car_registry/sing_up:
+    post:
+      tags:
+        - sing_up
+      summary: Add user
+      description: Add a new user
+      operationId: addNewUser
+      requestBody:
+        description: User to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: User added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/log_in:
+    post:
+      tags:
+        - log_in
+      summary: Log in
+      description: Log in to the application
+      operationId: logIn
+      requestBody:
+        description: User data to log in
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+              type: object
+              properties:
+                token:
+                  type: string
+        '400':
+          description: Bad request
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
 components:
   schemas:
     Vehicle:
@@ -343,4 +404,24 @@ components:
       type: object
       properties:
         id:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
           type: string

@@ -1,12 +1,7 @@
 package com.aalonso.CarRegistry.controller;
 
-import com.aalonso.CarRegistry.dto.BrandDTO;
-import com.aalonso.CarRegistry.dto.VehicleDTO;
-import com.aalonso.CarRegistry.dto.VehicleOrBrandIdRequest;
-import com.aalonso.CarRegistry.services.AddVehicleBrandService;
-import com.aalonso.CarRegistry.services.DeleteVehicleBrandService;
-import com.aalonso.CarRegistry.services.ShowVehicleBrandService;
-import com.aalonso.CarRegistry.services.UpdateVehicleBrandService;
+import com.aalonso.CarRegistry.dto.*;
+import com.aalonso.CarRegistry.services.interfaces.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +34,52 @@ public class CarRegistryController {
     DeleteVehicleBrandService deleteVehicleBrandService;
     @Autowired
     UpdateVehicleBrandService updateVehicleBrandService;
+    @Autowired
+    UserService userService;
+
+    // Endpoint registro usuario.
+    @PostMapping(value = "/sing_up", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<UserDTO>> singUp(@RequestBody UserDTO userDTO) {
+
+        log.info("Accessed car registry controller...");
+
+        if (userDTO == null) {
+            log.error("No user was provided");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<UserDTO> user = userService.singUp(userDTO);
+
+        if (user.isEmpty()) {
+            log.info("User not registered");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    //Endpoint inicio de sesión.
+    @PostMapping(value = "/log_in", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Optional<UserDTO>> logIn(@RequestBody LogInRequest logInRequest) {
+
+        log.info("Accessed car registry controller...");
+
+        if (logInRequest == null) {
+            log.error("User or pass wrong or not provided");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<UserDTO> user = userService.singIn(logInRequest);
+
+        if (user.isEmpty()) {
+            log.info("User not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
     // Endpoint para mostrar todos los vehiculos.
     @GetMapping(value = "/show_all_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
