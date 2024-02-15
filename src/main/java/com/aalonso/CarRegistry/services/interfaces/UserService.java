@@ -6,6 +6,5 @@ import com.aalonso.CarRegistry.dto.UserDTO;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<UserDTO> singUp(UserDTO userDTO);
-    Optional<UserDTO> singIn(LogInRequest logInRequest);
+    Optional<UserDTO> save(UserDTO userDTO);
 }

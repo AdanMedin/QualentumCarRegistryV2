@@ -1,12 +1,18 @@
 package com.aalonso.CarRegistry.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
-    private int id;
+    private String id;
     private String name;
-    private String mail;
+    private String email;
     private String password;
     private String role;
 }

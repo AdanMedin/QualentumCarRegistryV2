@@ -25,7 +25,7 @@ tags:
     description: Update vehicles from the database
   - name: delete_brands
     description: Delete vehicles from the database
-  - name: sing_up
+  - name: sign_up
     description: Add new users to the database
   - name: log_in
     description: Login to the application
@@ -306,10 +306,10 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
-  /car_registry/sing_up:
+  /car_registry/sign_up:
     post:
       tags:
-        - sing_up
+        - sign_up
       summary: Add user
       description: Add a new user
       operationId: addNewUser

@@ -32,3 +32,7 @@ email varchar(255) not null,
 password varchar(255) not null,
 role varchar(20) not null, default 'ROLE_CLIENT'
 );
+
+INSERT INTO user (name, email, password, role) VALUES ('Admin', 'admin@example.com', 'adminpassword', 'ROLE_ADMIN');
+
+INSERT INTO user (name, email, password) VALUES ('User', 'client@example.com', 'clientpassword');

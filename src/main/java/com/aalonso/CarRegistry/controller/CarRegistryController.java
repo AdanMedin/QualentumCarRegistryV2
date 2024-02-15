@@ -1,6 +1,7 @@
 package com.aalonso.CarRegistry.controller;
 
 import com.aalonso.CarRegistry.dto.*;
+import com.aalonso.CarRegistry.services.imp.AuthenticationService;
 import com.aalonso.CarRegistry.services.interfaces.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -35,12 +36,12 @@ public class CarRegistryController {
     @Autowired
     UpdateVehicleBrandService updateVehicleBrandService;
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     // Endpoint registro usuario.
-    @PostMapping(value = "/sing_up", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sign_up", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<UserDTO>> singUp(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Optional<JwtResponse>> singUp(@RequestBody UserDTO userDTO) {
 
         log.info("Accessed car registry controller...");
 
@@ -49,20 +50,20 @@ public class CarRegistryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Optional<UserDTO> user = userService.singUp(userDTO);
+        Optional<JwtResponse> jwtResponse = authenticationService.signUp(userDTO);
 
-        if (user.isEmpty()) {
-            log.info("User not registered");
+        if (jwtResponse.isEmpty()) {
+            log.error("User not registered");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 
     //Endpoint inicio de sesión.
     @PostMapping(value = "/log_in", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Optional<UserDTO>> logIn(@RequestBody LogInRequest logInRequest) {
+    public ResponseEntity<Optional<JwtResponse>> logIn(@RequestBody LogInRequest logInRequest) {
 
         log.info("Accessed car registry controller...");
 
@@ -71,14 +72,14 @@ public class CarRegistryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Optional<UserDTO> user = userService.singIn(logInRequest);
+        Optional<JwtResponse> jwtResponse = authenticationService.logIn(logInRequest);
 
-        if (user.isEmpty()) {
-            log.info("User not found");
+        if (jwtResponse.isEmpty()) {
+            log.info("User not found. Email or password wrong.");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 
     // Endpoint para mostrar todos los vehiculos.

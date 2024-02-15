@@ -11,9 +11,11 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig {
 
-    /** Implementación de Executor utiliza un pool de hilos para ejecutar tareas.
-        En lugar de crear un nuevo hilo para cada tarea, reutiliza los hilos existentes del pool.
-        Esto proporciona un mejor rendimiento ya que no se crean y destruyen hilos continuamente.   */
+    /**
+     * Implementación de Executor utiliza un pool de hilos para ejecutar tareas.
+     * En lugar de crear un nuevo hilo para cada tarea, reutiliza los hilos existentes del pool.
+     * Esto proporciona un mejor rendimiento ya que no se crean y destruyen hilos continuamente.
+     */
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
