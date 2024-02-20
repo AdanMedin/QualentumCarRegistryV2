@@ -37,6 +37,8 @@ paths:
       summary: Get the list of vehicles
       description: Returns the list of all vehicles
       operationId: showAllVehicles
+      security:
+        - CarRegistry_auth: [ ]
       responses:
         '200':
           description: List found
@@ -61,6 +63,8 @@ paths:
       summary: Get vehicles
       description: Returns a vehicle by id
       operationId: showVehicleById
+      security:
+        - CarRegistry_auth: [ ]
       parameters:
         - in: query
           name: id
@@ -90,6 +94,8 @@ paths:
       summary: Get the list of brands
       description: Returns the list of all brands
       operationId: showAllBrands
+      security:
+        - CarRegistry_auth: [ ]
       responses:
         '200':
           description: List found
@@ -114,6 +120,8 @@ paths:
       summary: Get brand
       description: Returns a brand by id
       operationId: showBrandById
+      security:
+        - CarRegistry_auth: [ ]
       parameters:
         - in: query
           name: id
@@ -143,6 +151,8 @@ paths:
       summary: Add vehicles
       description: Add a vehicle list
       operationId: addVehicles
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: List of vehicles to add
         content:
@@ -174,6 +184,8 @@ paths:
       summary: Add brands
       description: Add a brand list
       operationId: addBrands
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: List of brands to add
         content:
@@ -205,6 +217,8 @@ paths:
       summary: Update a vehicle
       description: Updates a vehicle
       operationId: updateVehicle
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: Vehicle data to update
         content:
@@ -234,6 +248,8 @@ paths:
       summary: Update a brand
       description: Updates a brand
       operationId: updateBrand
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: Brand data to update
         content:
@@ -263,6 +279,8 @@ paths:
       summary: Delete a vehicle
       description: Deletes a vehicle by id
       operationId: deleteVehicle
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: Vehicle data to delete
         content:
@@ -288,6 +306,8 @@ paths:
       summary: Delete a brand
       description: Delete a brand by id
       operationId: deleteBrand
+      security:
+        - CarRegistry_auth: [ ]
       requestBody:
         description: Brand data to delete
         content:
@@ -306,7 +326,7 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
-  /car_registry/sign_up:
+  /user/sign_up:
     post:
       tags:
         - sign_up
@@ -333,7 +353,7 @@ paths:
           description: Unexpected error
         '500':
           description: Internal error
-  /car_registry/log_in:
+  /user/log_in:
     post:
       tags:
         - log_in
@@ -410,7 +430,7 @@ components:
       properties:
         id:
           type: string
-        username:
+        name:
           type: string
         password:
           type: string
@@ -425,3 +445,8 @@ components:
           type: string
         password:
           type: string
+  securitySchemes:
+    CarRegistry_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
