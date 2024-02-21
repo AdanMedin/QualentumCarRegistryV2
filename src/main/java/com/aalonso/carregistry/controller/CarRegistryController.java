@@ -1,15 +1,19 @@
 package com.aalonso.carregistry.controller;
 
-import com.aalonso.carregistry.dto.*;
-import com.aalonso.carregistry.services.interfaces.*;
+import com.aalonso.carregistry.dto.BrandDTO;
+import com.aalonso.carregistry.dto.VehicleDTO;
+import com.aalonso.carregistry.dto.VehicleOrBrandIdRequest;
+import com.aalonso.carregistry.services.interfaces.AddVehicleBrandService;
+import com.aalonso.carregistry.services.interfaces.DeleteVehicleBrandService;
+import com.aalonso.carregistry.services.interfaces.ShowVehicleBrandService;
+import com.aalonso.carregistry.services.interfaces.UpdateVehicleBrandService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +22,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-@Controller
+@RestController
 @Validated
+@RequiredArgsConstructor
 @RequestMapping(value = "/car_registry")
 public class CarRegistryController {
     @PostConstruct
@@ -27,26 +32,29 @@ public class CarRegistryController {
         log.info("CarRegistryController is operational...");
     }
 
-    @Autowired
-    ShowVehicleBrandService showVehicleBrandService;
-    @Autowired
-    AddVehicleBrandService addVehicleBrandService;
-    @Autowired
-    DeleteVehicleBrandService deleteVehicleBrandService;
-    @Autowired
-    UpdateVehicleBrandService updateVehicleBrandService;
+    private static final String ACCESS_MESSAGE = "Accessed car registry controller...";
+    private static final String WRONG_BRAND_ID_MESSAGE = "Not brand id was provided";
+    private static final String WRONG_VEHICLE_ID_MESSAGE = "Not vehicle id was provided";
+
+
+    private final ShowVehicleBrandService showVehicleBrandService;
+
+    private final AddVehicleBrandService addVehicleBrandService;
+
+    private final DeleteVehicleBrandService deleteVehicleBrandService;
+
+    private final UpdateVehicleBrandService updateVehicleBrandService;
 
     // Endpoint para mostrar todos los vehiculos.
     @GetMapping(value = "/show_all_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<Optional<List<VehicleDTO>>>> showAllVehicles() {
 
-        log.info("Accessed car registry controller...");
-        CompletableFuture<Optional<List<VehicleDTO>>> VehicleList = showVehicleBrandService.showAllVehicles();
+        log.info(ACCESS_MESSAGE);
+        CompletableFuture<Optional<List<VehicleDTO>>> vehicleList = showVehicleBrandService.showAllVehicles();
 
         /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
-        return VehicleList.thenApply(vehicles -> {
+        return vehicleList.thenApply(vehicles -> {
 
             if (vehicles.isEmpty()) {
                 log.info("Not vehicles found");
@@ -59,35 +67,33 @@ public class CarRegistryController {
 
     // Endpoint para mostrar un vehiculo por id.
     @GetMapping(value = "/show_vehicle_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public ResponseEntity<Optional<VehicleDTO>> showVehicleById(VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
-            log.error("No vehicle id was provided");
+        if (vehicleOrBrandIdRequest == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+            log.error(WRONG_VEHICLE_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        } else {
-            Optional<VehicleDTO> vehicle = showVehicleBrandService.showVehicleById(vehicleOrBrandIdRequest.getId());
-
-            if (vehicle.isEmpty()) {
-                log.info("Vehicle not found");
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(vehicle, HttpStatus.OK);
         }
+        Optional<VehicleDTO> vehicle = showVehicleBrandService.showVehicleById(vehicleOrBrandIdRequest.getId());
+
+        if (vehicle.isEmpty()) {
+            log.info("Vehicle not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(vehicle, HttpStatus.OK);
+
     }
 
     // Endpoint para mostrar todas las marcas.
     @GetMapping(value = "/show_all_brands", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<Optional<List<BrandDTO>>>> showAllBrands() {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
         CompletableFuture<Optional<List<BrandDTO>>> brandList = showVehicleBrandService.showAllBrands();
 
         /*  ".ThenApply" es un método de CompletableFuture que toma una función y la aplica al resultado cuando está disponible.    */
@@ -104,35 +110,33 @@ public class CarRegistryController {
 
     // Endpoint para mostrar una marca por id.
     @GetMapping(value = "/show_brand_by_id", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public ResponseEntity<Optional<BrandDTO>> showBrandById(VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
-            log.error("Not brand id was provided");
+        if (vehicleOrBrandIdRequest == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+            log.error(WRONG_BRAND_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        } else {
-            Optional<BrandDTO> vehicle = showVehicleBrandService.showBrandById(vehicleOrBrandIdRequest.getId());
-
-            if (vehicle.isEmpty()) {
-                log.info("Brand not found");
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(vehicle, HttpStatus.OK);
         }
+        Optional<BrandDTO> vehicle = showVehicleBrandService.showBrandById(vehicleOrBrandIdRequest.getId());
+
+        if (vehicle.isEmpty()) {
+            log.info("Brand not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(vehicle, HttpStatus.OK);
+
     }
 
     // Endpoint para añadir vehiculos a la base de datos.
     @PostMapping(value = "/add_vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<Optional<List<VehicleDTO>>>> addVehicle(@RequestBody List<VehicleDTO> vehicleDTOList) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
         if (vehicleDTOList == null || vehicleDTOList.isEmpty()) {
 
@@ -167,11 +171,10 @@ public class CarRegistryController {
 
     // Endpoint para añadir marcas a la base de datos.
     @PostMapping(value = "/add_brands", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<Optional<List<BrandDTO>>>> addBrand(@RequestBody List<BrandDTO> brandDTOList) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
         if (brandDTOList == null || brandDTOList.isEmpty()) {
 
@@ -205,15 +208,14 @@ public class CarRegistryController {
 
     // Endpoint para actualizar vehiculos en la base de datos.
     @PutMapping(value = "/update_vehicle", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Optional<VehicleDTO>> updateVehicle(@RequestBody VehicleDTO vehicle) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (vehicle.getId() == null || vehicle.getId().isEmpty()) {
+        if (vehicle == null || vehicle.getId() == null || vehicle.getId().isEmpty()) {
 
-            log.error("Not vehicle id was provided");
+            log.error(WRONG_VEHICLE_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         } else {
@@ -232,15 +234,14 @@ public class CarRegistryController {
 
     // Endpoint para actualizar marcas en la base de datos.
     @PutMapping(value = "/update_brand", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Optional<BrandDTO>> updateBrand(@RequestBody BrandDTO brandDTO) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (brandDTO.getId() == null || brandDTO.getId().isEmpty()) {
+        if (brandDTO == null || brandDTO.getId() == null || brandDTO.getId().isEmpty()) {
 
-            log.error("Not brand id was provided");
+            log.error(WRONG_BRAND_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         } else {
@@ -259,15 +260,14 @@ public class CarRegistryController {
 
     // Endpoint para eliminar vehiculos de la base de datos.
     @DeleteMapping(value = "/delete_vehicle", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Optional<VehicleDTO>> deleteVehicleById(@RequestBody VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+        if (vehicleOrBrandIdRequest == null || vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
 
-            log.error("Not vehicle id was provided");
+            log.error(WRONG_VEHICLE_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         } else {
@@ -285,15 +285,14 @@ public class CarRegistryController {
 
     // Endpoint para eliminar marcas de la base de datos.
     @DeleteMapping(value = "/delete_brand", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Optional<BrandDTO>> deleteBrandById(@RequestBody VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
 
-        log.info("Accessed car registry controller...");
+        log.info(ACCESS_MESSAGE);
 
-        if (vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
+        if (vehicleOrBrandIdRequest == null || vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
 
-            log.error("Not brand id was provided");
+            log.error(WRONG_BRAND_ID_MESSAGE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         } else {

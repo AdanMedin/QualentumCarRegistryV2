@@ -9,31 +9,28 @@ import com.aalonso.carregistry.persistence.repository.VehicleRepository;
 import com.aalonso.carregistry.services.interfaces.ShowVehicleBrandService;
 import com.aalonso.carregistry.utils.Utils;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ShowVehicleBrandServiceImp implements ShowVehicleBrandService {
     @PostConstruct
     public void init() {
         log.info("ShowVehicleBrandServiceImp is operational...");
     }
 
-    @Autowired
-    private VehicleRepository vehicleRepository;
-    @Autowired
-    private BrandRepository brandRepository;
-    @Autowired
-    private Utils utils;
+    private final VehicleRepository vehicleRepository;
+    private final BrandRepository brandRepository;
+    private final Utils utils;
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Este método devuelve un Optional que contiene una lista de objetos VehicleDTO.
@@ -71,7 +68,7 @@ public class ShowVehicleBrandServiceImp implements ShowVehicleBrandService {
         return CompletableFuture.completedFuture(
                 vehicles.isEmpty() ? Optional.empty() : Optional.of(vehicles.stream()
                         .map(vehicle -> modelMapper.map(vehicle, VehicleDTO.class))
-                        .collect(Collectors.toList()))
+                        .toList())
         );
     }
 
@@ -132,7 +129,7 @@ public class ShowVehicleBrandServiceImp implements ShowVehicleBrandService {
         return CompletableFuture.completedFuture(
                 brandsToShow.isEmpty() ? Optional.empty() : Optional.of(brandsToShow.stream()
                         .map(brand -> modelMapper.map(brand, BrandDTO.class))
-                        .collect(Collectors.toList()))
+                        .toList())
         );
     }
 

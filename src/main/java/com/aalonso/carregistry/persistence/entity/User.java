@@ -22,15 +22,15 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    String id;
+    private String id;
     @Column(nullable = false)
-    String name;
+    private String name;
     @Column(nullable = false, unique = true)
-    String email;
+    private String email;
     @Column(nullable = false)
-    String password;
+    private String password;
     @Column(nullable = false, columnDefinition = "default 'ROLE_CLIENT'")
-    String role;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

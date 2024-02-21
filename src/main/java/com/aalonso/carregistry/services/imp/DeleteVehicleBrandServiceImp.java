@@ -9,23 +9,24 @@ import com.aalonso.carregistry.persistence.repository.VehicleRepository;
 import com.aalonso.carregistry.services.interfaces.DeleteVehicleBrandService;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DeleteVehicleBrandServiceImp implements DeleteVehicleBrandService {
     @PostConstruct
     public void init() {
         log.info("DeleteVehicleBrandServiceImp is operational...");
     }
-    @Autowired
-    private VehicleRepository vehicleRepository;
-    @Autowired
-    private BrandRepository brandRepository;
+
+    private final VehicleRepository vehicleRepository;
+    private final BrandRepository brandRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Elimina vehiculos de la base de datos

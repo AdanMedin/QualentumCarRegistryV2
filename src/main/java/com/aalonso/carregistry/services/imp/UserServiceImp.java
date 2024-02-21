@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -37,14 +36,8 @@ public class UserServiceImp implements UserService {
      * En este caso, el nombre de usuario es el correo electrónico del usuario.
      */
     public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String email) {
-
-                return userRepository.findByEmail(email)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            }
-        };
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     // Este método registra a un usuario en la base de datos.

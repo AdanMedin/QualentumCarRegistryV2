@@ -1,7 +1,7 @@
 package com.aalonso.carregistry.config;
 
 
-import com.aalonso.carregistry.filter.JwtAthenticationFilter;
+import com.aalonso.carregistry.filter.JwtAuthenticationFilter;
 import com.aalonso.carregistry.services.imp.UserServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAthenticationFilter jwtAthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserServiceImp userService;
     private final PasswordEncoder passwordEncoder;
 
@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/car_registry/**").permitAll()
                         .requestMatchers("/v3/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**", "/v2/api-docs", "openapi.yaml").permitAll()
                         .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

@@ -4,13 +4,16 @@ import com.aalonso.carregistry.dto.JwtResponse;
 import com.aalonso.carregistry.dto.LogInRequest;
 import com.aalonso.carregistry.dto.UserDTO;
 import com.aalonso.carregistry.services.imp.AuthenticationService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
@@ -19,12 +22,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    @Autowired
-    AuthenticationService authenticationService;
+
+    @PostConstruct
+    public void init() {
+        log.info("UserController is operational...");
+    }
+
+    private final AuthenticationService authenticationService;
 
     // Endpoint registro usuario.
     @PostMapping(value = "/sign_up", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public ResponseEntity<Optional<JwtResponse>> singUp(@RequestBody UserDTO userDTO) {
 
         log.info("Accessed car registry controller...");
@@ -46,7 +53,6 @@ public class UserController {
 
     //Endpoint inicio de sesión.
     @PostMapping(value = "/log_in", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public ResponseEntity<Optional<JwtResponse>> logIn(@RequestBody LogInRequest logInRequest) {
 
         log.info("Accessed car registry controller...");

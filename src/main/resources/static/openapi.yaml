@@ -428,15 +428,11 @@ components:
     User:
       type: object
       properties:
-        id:
-          type: string
         name:
           type: string
         password:
           type: string
         email:
-          type: string
-        role:
           type: string
     LoginRequest:
       type: object

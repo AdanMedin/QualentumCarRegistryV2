@@ -9,9 +9,9 @@ import com.aalonso.carregistry.persistence.repository.VehicleRepository;
 import com.aalonso.carregistry.services.interfaces.AddVehicleBrandService;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +23,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AddVehicleBrandServiceImp implements AddVehicleBrandService {
     @PostConstruct
     public void init() {
         log.info("AddVehicleBrandServiceImp is operational...");
     }
 
-    @Autowired
-    private VehicleRepository vehicleRepository;
-    @Autowired
-    private BrandRepository brandRepository;
+    private final VehicleRepository vehicleRepository;
+    private final BrandRepository brandRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
 

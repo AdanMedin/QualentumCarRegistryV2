@@ -35,14 +35,10 @@ public class AuthenticationService {
 
         log.info("Accessed authentication service...");
 
-        UserDTO userdto = UserDTO.builder()
-                .name(userDTO.getName())
-                .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
-                .role("ROLE_CLIENT")
-                .build();
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        userDTO.setRole("ROLE_CLIENT");
 
-        Optional<UserDTO> savedUserDTO = userServiceImp.save(userdto);
+        Optional<UserDTO> savedUserDTO = userServiceImp.save(userDTO);
 
         if (savedUserDTO.isPresent()) {
 
