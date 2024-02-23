@@ -127,7 +127,7 @@ public class AddVehicleBrandServiceImp implements AddVehicleBrandService {
     }
 
     // Cuando añadimos un nuevo vehículo comprueba si la marca existe en la base de datos y si es válida, si no existe se añade.
-    private Optional<BrandDTO> brandChecker(BrandDTO brandDTO) {
+    protected Optional<BrandDTO> brandChecker(BrandDTO brandDTO) {
 
         // AtomicReference es una clase que permite almacenar una referencia a un objeto en un entorno concurrente.
         AtomicReference<Brand> brandChecked = new AtomicReference<>(modelMapper.map(brandDTO, Brand.class));
