@@ -58,7 +58,7 @@ public class JwtService {
     }
 
     // Este método verifica si el token JWT ha expirado.
-    private boolean isTokenExpired(String jwtToken) {
+    protected boolean isTokenExpired(String jwtToken) {
         return extractExpiration(jwtToken).before(new Date());
     }
 
@@ -68,7 +68,7 @@ public class JwtService {
     }
 
     // Este método genera un token JWT a partir de las reclamaciones y los detalles de un usuario.
-    private String generateToken(HashMap<String, Object> extractClaims, UserDetails userDetails) {
+    protected String generateToken(HashMap<String, Object> extractClaims, UserDetails userDetails) {
         return Jwts
                 .builder() // Este método inicia la construcción de un token JWT.
                 .setClaims(extractClaims) // Este método establece las reclamaciones del token.
@@ -80,13 +80,13 @@ public class JwtService {
     }
 
     // Este método extrae una reclamación específica de un token JWT.
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
+    protected <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
 
     // Este método extrae todas las reclamaciones de un token JWT.
-    private Claims extractAllClaims(String token) {
+    protected Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -96,7 +96,7 @@ public class JwtService {
     }
 
     // Este método genera la clave de firma para los tokens JWT a partir de la clave secreta.
-    private Key getSigningKey() {
+    protected Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
