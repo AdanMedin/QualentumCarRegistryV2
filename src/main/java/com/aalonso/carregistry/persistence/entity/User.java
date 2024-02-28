@@ -31,6 +31,8 @@ public class User implements UserDetails {
     private String password;
     @Column(nullable = false, columnDefinition = "default 'ROLE_CLIENT'")
     private String role;
+    @Column()
+    private String image;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

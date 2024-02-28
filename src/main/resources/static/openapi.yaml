@@ -29,6 +29,8 @@ tags:
     description: Add new users to the database
   - name: log_in
     description: Login to the application
+  - mame: files_management
+    description: Files management
 paths:
   /car_registry/show_all_vehicles:
     get:
@@ -379,6 +381,112 @@ paths:
                   type: string
         '400':
           description: Bad request
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/userImage/upload:
+    post:
+      tags:
+        - files_management
+      summary: Add image
+      description: Add a new user image
+      operationId: addUserImage
+      security:
+        - CarRegistry_auth: [ ]
+      requestBody:
+        description: Image to add
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The id of the user to upload the image
+                imageFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image added successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/userImage/download:
+    get:
+      tags:
+        - files_management
+      summary: Get image
+      description: Returns a user image by id
+      operationId: getUserImage
+      security:
+        - CarRegistry_auth: [ ]
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The id of the user to retrieve
+      responses:
+        '200':
+          description: User image found
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/vehiclesData/uploadCsv:
+    post:
+      tags:
+        - files_management
+      summary: Add vehicles
+      description: Add a vehicles list from a csv file
+      operationId: addVehiclesFromCsv
+      security:
+        - CarRegistry_auth: [ ]
+      requestBody:
+        description: Vehicles data to add
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The csv file to upload
+      responses:
+        '200':
+          description: Vehicles added successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
         default:
           description: Unexpected error
         '500':
