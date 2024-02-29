@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +29,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping(value = "/userImage/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public ResponseEntity<String> uploadUserImage(@RequestParam(value = "id") String id, @RequestParam(value = "imageFile") MultipartFile imageFile) {
 
         if (imageFile == null) {
@@ -58,6 +60,7 @@ public class FileController {
     }
 
     @GetMapping(value = "/userImage/download", produces = MediaType.IMAGE_PNG_VALUE)
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
     public ResponseEntity<byte[]> downloadUserImage(VehicleOrBrandIdRequest vehicleOrBrandIdRequest) {
 
         if (vehicleOrBrandIdRequest == null || vehicleOrBrandIdRequest.getId() == null || vehicleOrBrandIdRequest.getId().isEmpty()) {
@@ -82,6 +85,7 @@ public class FileController {
 
 
     @PostMapping(value = "/vehiclesData/uploadCsv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> uploadVehiclesCsv(@RequestParam(value = "file") MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
@@ -111,11 +115,22 @@ public class FileController {
         return new ResponseEntity<>("File format not supported",HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping(value = "/vehiclesData_download", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<String> downloadVehiclesFile() {
+    @GetMapping(value = "/vehiclesData/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_ADMIN')")
+    public ResponseEntity<byte[]> downloadVehiclesExcel() {
 
-        log.info("File {} downloaded", "file.txt");
+        Optional<byte[]> response = fileService.downloadVehiclesExcel();
 
-        return ResponseEntity.ok("User image successfully downloaded.");
+        if (response.isEmpty()) {
+            log.error("Error downloading file");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        log.info("File vehicles.xlsx downloaded successfully");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=vehicles.xlsx");
+
+        return ResponseEntity.ok().headers(headers).body(response.get());
     }
 }

@@ -30,6 +30,6 @@ id int primary key not null AUTO_INCREMENT,
 name varchar(100) not null,
 email varchar(255) not null,
 password varchar(255) not null,
-role varchar(20) not null, default 'ROLE_CLIENT',
+role varchar(20) default 'ROLE_CLIENT' not null,
 image varchar(255)
 );

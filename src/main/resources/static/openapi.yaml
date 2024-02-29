@@ -29,7 +29,7 @@ tags:
     description: Add new users to the database
   - name: log_in
     description: Login to the application
-  - mame: files_management
+  - name: files_management
     description: Files management
 paths:
   /car_registry/show_all_vehicles:
@@ -483,6 +483,31 @@ paths:
             text/plain:
               schema:
                 type: string
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+        '500':
+          description: Internal error
+  /car_registry/vehiclesData/download:
+    get:
+      tags:
+        - files_management
+      summary: Get vehicles data
+      description: Returns a csv file with the vehicles data
+      operationId: getVehiclesData
+      security:
+        - CarRegistry_auth: [ ]
+      responses:
+        '200':
+          description: Excel file with vehicles data downloaded
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         '400':
           description: Bad request
         '404':

@@ -32,7 +32,7 @@ public class User implements UserDetails {
     @Column(nullable = false, columnDefinition = "default 'ROLE_CLIENT'")
     private String role;
     @Column()
-    private String image;
+    private byte[] image;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
